@@ -1,13 +1,9 @@
 
 
+
 //Library voor het uitlezen van de time module (ds3231)
 #include <DS3231.h>
 DS3231  rtc(SDA, SCL);
-
-
-
-
-char daysOfTheWeek[7][12] = {"Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"};
 
 
 //Library voor de dht temperatuursensor 
@@ -53,6 +49,11 @@ byte o[8]=     {0x7E,0x7E,0x66,0x66,0x66,0x66,0x7E,0x7E};
 LedControl lc=LedControl(DIN,CLK,CS,0);
 void setup() {
 
+ 
+
+
+
+
 lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
  lc.setIntensity(0,15);      // Set the brightness to maximum value
  lc.clearDisplay(0);         // and clear the display
@@ -76,6 +77,7 @@ lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
 }
 
 void loop() {
+
 
 
 //Matrix voor het verdrietig gezicht
@@ -130,6 +132,8 @@ B00000000,
       moist = analogRead(sensorMoist);
   Serial.println(moist);
   delay(2000);
+
+  //Leest de waarden van de time module uit
 Serial.println(rtc.getDateStr());
 Serial.println(rtc.getTimeStr());
 
