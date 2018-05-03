@@ -1,10 +1,21 @@
 
+
+//Library voor het uitlezen van de time module (ds3231)
+#include <DS3231.h>
+DS3231  rtc(SDA, SCL);
+
+
+
+
+char daysOfTheWeek[7][12] = {"Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"};
+
+
 //Library voor de dht temperatuursensor 
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
 
-//Bibliotheek voor het aansturen van het LED matrix
+//Library voor het aansturen van het LED matrix
 #include <LedControl.h>
 
 
@@ -20,6 +31,10 @@ DHT dht(dht22, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
 
 int chk;
 float temp; //Stores temperature value
+
+//Variabelen voor de ldr
+int ldr = A11;
+int ldrValue;
 
 
 
@@ -48,6 +63,15 @@ lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
 
 
  pinMode(sensorMoist, INPUT);
+ pinMode(ldr, INPUT);
+
+ //Beginnen van time module
+ rtc.begin();
+
+ //Code om de datum en tijd in te stellen
+ //rtc.setDOW(THURSDAY);     // Set Day-of-Week to SUNDAY
+ // rtc.setTime(12, 14, 0);     // Set the time to 12:00:00 (24hr format)
+ // rtc.setDate(03, 05, 2018);   // Set the date to January 1st, 2014
 
 }
 
@@ -106,7 +130,14 @@ B00000000,
       moist = analogRead(sensorMoist);
   Serial.println(moist);
   delay(2000);
+Serial.println(rtc.getDateStr());
+Serial.println(rtc.getTimeStr());
 
+
+//Leest de waarden van de ldr uit
+ldrValue = analogRead(ldr);
+Serial.println(ldrValue);
+  
 }
 
 
