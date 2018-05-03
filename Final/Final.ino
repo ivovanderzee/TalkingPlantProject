@@ -8,6 +8,11 @@
 #include <LedControl.h>
 
 
+//Variabelen voor het opmeten van de vochtigheid
+int moist;
+int sensorMoist = A10;
+
+
 //Variabelen voor de dht temperatuursensor
 int dht22 = 22;
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
@@ -41,6 +46,9 @@ lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
  dht.begin();
  Serial.begin(9600);
 
+
+ pinMode(sensorMoist, INPUT);
+
 }
 
 void loop() {
@@ -70,6 +78,8 @@ B00000000,
   B01000110,
   B00100110,
   B00000000
+
+
 };
 
 
@@ -80,6 +90,7 @@ B00000000,
 
 
     //Leest de data uit van de dht temperatuursensor en plaatst deze in de variabelen
+
    
     temp= dht.readTemperature();
     
@@ -88,6 +99,13 @@ B00000000,
     Serial.print(temp);
     Serial.println(" Celsius");
     delay(2000); //Delay 2 sec.
+    
+
+
+    //Leest de waarden van de vochtigheid uit
+      moist = analogRead(sensorMoist);
+  Serial.println(moist);
+  delay(2000);
 
 }
 
