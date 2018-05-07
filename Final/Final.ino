@@ -1,6 +1,18 @@
 
 
 
+//Library voor het configureren van de speaker
+#include <SPI.h>
+#include <SdFat.h>
+#include <SdFatUtil.h>
+#include <SFEMP3Shield.h>
+
+//Variabelen voor het functioneren van de speaker
+SdFat sd;
+SFEMP3Shield MP3player;
+int numberOfTracks = 9;
+
+
 //Library voor het uitlezen van de time module (ds3231)
 #include <DS3231.h>
 DS3231  rtc(SDA, SCL);
@@ -19,6 +31,9 @@ DS3231  rtc(SDA, SCL);
 int moist;
 int sensorMoist = A10;
 
+//Variabelen voor de PIR motion sensor
+int pirPin = 36;
+int pirValue;
 
 //Variabelen voor de dht temperatuursensor
 int dht22 = 22;
@@ -49,7 +64,16 @@ byte o[8]=     {0x7E,0x7E,0x66,0x66,0x66,0x66,0x7E,0x7E};
 LedControl lc=LedControl(DIN,CLK,CS,0);
 void setup() {
 
- 
+
+ //Configuratie van het mp3 shield
+ if (!sd.begin(SD_SEL, SPI_HALF_SPEED)) 
+  {
+    sd.initErrorHalt(); 
+  }
+
+  MP3player.begin();
+  MP3player.setBitRate(192);
+  MP3player.setVolume(0,0); 
 
 
 
@@ -65,6 +89,7 @@ lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
 
  pinMode(sensorMoist, INPUT);
  pinMode(ldr, INPUT);
+ pinMode(pirPin, INPUT);
 
  //Beginnen van time module
  rtc.begin();
@@ -77,6 +102,7 @@ lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
 }
 
 void loop() {
+
 
 
 
@@ -124,14 +150,14 @@ B00000000,
     Serial.print(" %, Temp: ");
     Serial.print(temp);
     Serial.println(" Celsius");
-    delay(2000); //Delay 2 sec.
+    
     
 
 
     //Leest de waarden van de vochtigheid uit
       moist = analogRead(sensorMoist);
   Serial.println(moist);
-  delay(2000);
+
 
   //Leest de waarden van de time module uit
 Serial.println(rtc.getDateStr());
@@ -141,6 +167,27 @@ Serial.println(rtc.getTimeStr());
 //Leest de waarden van de ldr uit
 ldrValue = analogRead(ldr);
 Serial.println(ldrValue);
+
+
+//Leest waarden van de pir motion sensor uit
+pirValue = digitalRead(pirPin);
+Serial.println(pirValue);
+
+
+
+//Uitlezen van mp3 wanneer PIR sensor 1 is
+if (digitalRead(pirValue) == 1)
+  {
+    MP3player.playTrack(random(1, numberOfTracks + 1));
+    delay(50);
+    
+    while (MP3player.isPlaying() == 1)
+    {
+      delay(50);
+    }
+
+    
+  }
   
 }
 
