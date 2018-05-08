@@ -1,6 +1,12 @@
 
 
 
+
+
+
+
+
+
 //Library voor het configureren van de speaker
 #include <SPI.h>
 #include <SdFat.h>
@@ -15,7 +21,13 @@ int numberOfTracks = 9;
 
 //Library voor het uitlezen van de time module (ds3231)
 #include <DS3231.h>
+#include <RTClib.h>
+#include <Wire.h>
+
+RTC_DS1307 rtc2;
 DS3231  rtc(SDA, SCL);
+
+
 
 
 //Library voor de dht temperatuursensor 
@@ -93,6 +105,8 @@ lc.shutdown(0,false);       //The MAX72XX is in power-saving mode on startup
 
  //Beginnen van time module
  rtc.begin();
+ 
+ 
 
  //Code om de datum en tijd in te stellen
  //rtc.setDOW(THURSDAY);     // Set Day-of-Week to SUNDAY
@@ -135,11 +149,10 @@ B00000000,
 };
 
 
-    //Print het blije gezicht
-    printByte(blij);
+   
      
 
-
+/*
 
     //Leest de data uit van de dht temperatuursensor en plaatst deze in de variabelen
 
@@ -153,15 +166,41 @@ B00000000,
     
     
 
-
+*/
     //Leest de waarden van de vochtigheid uit
       moist = analogRead(sensorMoist);
   Serial.println(moist);
 
+//Als de waarde van de vochtigheid onder bepaalde waarde komt zegt de plant iets en verandert het gezicht op het display
+  if (moist > 980){
+
+    MP3player.playTrack(random(6, 10));
+    delay(50);
+    
+    while (MP3player.isPlaying() == 1)
+    {
+      delay(50);
+    }
+
+printByte(verdrietig);
+
+
+    
+  }
+  else{
+    printByte(blij);
+  }
+
 
   //Leest de waarden van de time module uit
+DateTime now = rtc2.now();
+ 
 Serial.println(rtc.getDateStr());
 Serial.println(rtc.getTimeStr());
+delay(1000);
+
+
+
 
 
 //Leest de waarden van de ldr uit
@@ -174,22 +213,65 @@ pirValue = digitalRead(pirPin);
 Serial.println(pirValue);
 
 
+if(pirValue == 1){
+  
+  if(now.hour() > 6 && now.hour() < 12){
 
-//Uitlezen van mp3 wanneer PIR sensor 1 is
-if (digitalRead(pirValue) == 1)
-  {
-    MP3player.playTrack(random(1, numberOfTracks + 1));
+   MP3player.playTrack(2);
     delay(50);
     
     while (MP3player.isPlaying() == 1)
     {
       delay(50);
     }
+}
+else if(now.hour() > 12 && now.hour() < 18){
 
+
+   MP3player.playTrack(3);
+    delay(50);
     
-  }
+    while (MP3player.isPlaying() == 1)
+    {
+      delay(50);
+    }
   
 }
+
+else if(now.hour() > 18 && now.hour() < 00){
+
+
+   MP3player.playTrack(4);
+    delay(50);
+    
+    while (MP3player.isPlaying() == 1)
+    {
+      delay(50);
+    }
+  
+}
+else if(now.hour() > 00 && now.hour() < 6){
+
+
+   MP3player.playTrack(5);
+    delay(50);
+    
+    while (MP3player.isPlaying() == 1)
+    {
+      delay(50);
+    }
+  
+}
+  
+  
+  }
+
+
+
+  
+  
+}
+
 
 
 //Methode voor het tekenen van het led matrix
